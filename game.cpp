@@ -1,9 +1,16 @@
-// consoleSnake.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include "game.h"
 
 
+Game::Game()
+{
+    cursor = &Cursor::getInstance();
+    snakebox = nullptr;
+    menubox = nullptr;
+    snake = nullptr;
+    score = nullptr;
+    gameover = false;
+    level = Speed::SLOW;
+}
 
 void Game::initialize()
 {
@@ -13,7 +20,7 @@ void Game::initialize()
     Coordinate head(SNAKE_X_INIT_COOR, SNAKE_Y_INIT_COOR);
     head.symbol = SNAKE_HEAD_SYMBOL;
     head.color = SNAKE_HEAD_COLOR;
-    snake = new Snake(head, snakebox, score, SNAKE_INIT_LEN, RIGHT_DIRECTION, level);
+    snake = new Snake(head, snakebox, score, level, SNAKE_INIT_LEN, RIGHT_DIRECTION);
 }
 
 
@@ -25,7 +32,6 @@ void Game::start()
     score->generate();
     move_thread = unique_ptr<thread>(new thread(&Snake::move, snake));
     input_control_thread = unique_ptr<thread>(new thread(&Snake::directionController, snake));
-
 }
 
 void Game::end()
@@ -43,7 +49,6 @@ void Game::end()
     score = nullptr;
     delete menubox;
     menubox = nullptr;
-    //cout << "Game::end()" << endl;
 }
 
 void Game::wait()
@@ -52,13 +57,6 @@ void Game::wait()
     input_control_thread->join();
 
     gameover = true;
-    //cout << "Game::wait()" << endl;
-}
-
-void Game::noticeHighScore()
-{
-    cursor->gotoxy(SNAKE_BOX_LENGTH / 2, SNAKE_BOX_HEIGHT + 5);
-    cursor->generate<string>("HIGH SCORE!", 10);
 }
 
 void Game::showHighScore()
@@ -89,10 +87,10 @@ void Game::showHighScore()
     f.close();
     cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR + 6);
     cursor->generate("OK", 26);
-    
+    this_thread::sleep_for(chrono::milliseconds(150));
     while (true)
     {
-        if (GetAsyncKeyState(VK_RETURN) & 1)
+        if (GetAsyncKeyState(VK_RETURN) & 0x8000)
         {
             cin.clear();
             for (int i = 0; i < v.size(); ++i)
@@ -141,7 +139,7 @@ void Game::clearMainMenu()
         for (unsigned int j = 0; j < string(mainMenu[i]).length(); ++j)
         {
             cursor->gotoxy(SNAKE_BOX_LEFT_COOR + j, SNAKE_BOX_TOP_COOR + i);
-            cursor->generate(NULL_SYMBOL, 0);
+            cursor->generate(NULL_SYMBOL, NULL_COLOR);
         }
     }
 }
@@ -198,12 +196,18 @@ void Game::clearHowToPlay()
 void Game::menu()
 {
     int option = 0;
-
-    //bool sub = false;
-    //bool is_first_run = true;
-
+    cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR);
+    cursor->generate("Your name: ", 10);
+    string player_name = "";
+    getline(cin, player_name);
+    player.name = player_name.length() < MAX_NAME_LEN ? player_name : player_name.substr(0, MAX_NAME_LEN);
+    for (int i = 0; i < 11 + player_name.length(); ++i)
+    {
+        cursor->gotoxy(SNAKE_BOX_LEFT_COOR + i, SNAKE_BOX_TOP_COOR);
+        cursor->generate(NULL_SYMBOL, NULL_COLOR);
+    }
     showMainMenu();
-    //cin.clear();
+    this_thread::sleep_for(chrono::milliseconds(150));
     while ( true )
     {
         if (gameover == true)
@@ -214,17 +218,15 @@ void Game::menu()
         
         while (true)
         {
-            /*cin.clear();*/
-            //cin.ignore(INT_MAX);
-            if (GetAsyncKeyState(VK_RETURN) & 1)
+            if (GetKeyState(VK_RETURN) & 0x8000)
             {
                 clearMainMenu();
-                //cin.clear();
+                cin.clear();
+                
                 break;
             }
-            else if (GetAsyncKeyState('W') & 1 || GetAsyncKeyState(VK_UP) & 1)
+            else if (GetAsyncKeyState('W') & 0x8000 || GetAsyncKeyState(VK_UP) & 0x8000)
             {
-                //cin.clear();
                 cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR + option);
                 cursor->generate(mainMenu[option], 10);
                 if (option == 0)
@@ -235,9 +237,8 @@ void Game::menu()
                 cursor->generate(mainMenu[option], 26);
                 this_thread::sleep_for(chrono::milliseconds(150));
             }
-            else if (GetAsyncKeyState('S') & 1 || GetAsyncKeyState(VK_DOWN) & 1)
+            else if (GetAsyncKeyState('S') & 0x8000 || GetAsyncKeyState(VK_DOWN) & 0x8000)
             {
-                //cin.clear();
                 cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR + option);
                 cursor->generate(mainMenu[option], 10);
                 if (option == 4)
@@ -251,52 +252,33 @@ void Game::menu()
             else
                 this_thread::sleep_for(chrono::microseconds(500));
         }
-        //cin.clear();
-        //clearMainMenu();
-
         switch (option)
         {
         case PLAY_GAME:
         {
-            cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-            cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR);
-            cursor->generate("Your name: ", 10);
-            //cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-            string player_name;
-            getline(cin, player_name);
-            player.name = player_name.length() < MAX_NAME_LEN ? player_name : player_name.substr(0, MAX_NAME_LEN);
-            
-            for (int i = 0; i < 11 + player_name.length(); ++i)
-            {
-                cursor->gotoxy(SNAKE_BOX_LEFT_COOR + i, SNAKE_BOX_TOP_COOR);
-                cursor->generate(NULL_SYMBOL, NULL_COLOR);
-            }
             initialize();
             start();
             wait();
             end();
-            //cin.clear();
             break;
         }
         case LEVEL:
         {
-            //cin.ignore((numeric_limits<streamsize>::max)(), '\n');
             int level_opt = 0;
             showLevelMenu();
-            
+            this_thread::sleep_for(chrono::milliseconds(150));
             while (true)
             {
-                //cin.ignore((numeric_limits<streamsize>::max)(), '\n');
-                if (GetAsyncKeyState(VK_RETURN) & 1)
+                if (GetAsyncKeyState(VK_RETURN) & 0x8000)
                 {
-                    level = level_opt;
+                    level = level_opt == 0 ? Speed::SLOW : level_opt == 1 ? Speed::NORMAL : Speed::FAST;
                     clearLevelMenu();
                     showMainMenu();
                     option = 0;
-                    //this_thread::sleep_for(chrono::milliseconds(150));
+                    this_thread::sleep_for(chrono::milliseconds(150));
                     break;
                 }
-                else if (GetAsyncKeyState('W') & 1 || GetAsyncKeyState(VK_UP) & 1)
+                else if (GetAsyncKeyState('W') & 0x8000 || GetAsyncKeyState(VK_UP) & 0x8000)
                 {
                     cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR + level_opt);
                     cursor->generate(levelMenu[level_opt], 10);
@@ -308,7 +290,7 @@ void Game::menu()
                     cursor->generate(levelMenu[level_opt], 26);
                     this_thread::sleep_for(chrono::milliseconds(150));
                 }
-                else if (GetAsyncKeyState('S') & 1 || GetAsyncKeyState(VK_DOWN) & 1)
+                else if (GetAsyncKeyState('S') & 0x8000 || GetAsyncKeyState(VK_DOWN) & 0x8000)
                 {
                     cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR + level_opt);
                     cursor->generate(levelMenu[level_opt], 10);
@@ -331,41 +313,42 @@ void Game::menu()
             showMainMenu();
             option = 0;
             cin.clear();
+            this_thread::sleep_for(chrono::milliseconds(150));
             break;
         }
         case HOW_TO_PLAY:
         {
-            //cin.clear();
             showHowToPlay();
-            /*cin.ignore((numeric_limits<streamsize>::max)(), '\n');*/
+            this_thread::sleep_for(chrono::milliseconds(150));
             while (true)
             {
-                if (GetAsyncKeyState(VK_RETURN) & 1)
+                if (GetAsyncKeyState(VK_RETURN) & 0x8000)
                 {
-                    
                     clearHowToPlay();
                     showMainMenu();
-                    
+                    this_thread::sleep_for(chrono::milliseconds(150));
                     break;
                 }
                 else
                     this_thread::sleep_for(chrono::microseconds(500));
             }
             option = 0;
+            
             break;
         }
         case QUIT:
         {
+            clearMainMenu();
+            cursor->gotoxy(SNAKE_BOX_LEFT_COOR, SNAKE_BOX_TOP_COOR);
+            cursor->generate("See you again!!!", 10);
+            this_thread::sleep_for(chrono::seconds(2));
             return;
         }
         default:
             break;
         }
     }
-    //return option;
 }
-
- 
 
 Game::~Game()
 {
@@ -380,28 +363,3 @@ Game::~Game()
     delete menubox;
     menubox = nullptr;
 }
-
-
-
-
-
-
-
-
-
-
-
-//void Snake::startMove()
-//{
-//    //end_game = false;
-//    move_thread = new thread(&Snake::move, this);
-//}
-//
-//void Snake::stopMove()
-//{/*
-//    end_game = true;
-//    while (!isStopped())
-//        this_thread::sleep_for(chrono::milliseconds(5));*/
-//    move_thread->join();
-//}
-

@@ -48,9 +48,11 @@ bool Score::checkHighScoreAndSave()
 		ss >> s_name >> i_score;
 		hs.push_back({ i_score, s_name });
 	}
-	sort(hs.begin(), hs.end(), [](pair<int, string> a, pair<int, string> b)->bool {return a.first > b.first; });
+	sort(hs.begin(), hs.end(), [](pair<int, string> a, pair<int, string> b)->bool {
+		return a.first > b.first; 
+	});
 	score_file.close();
-	string tmp_name = "data/tmp.txt";
+	string tmp_name = "tmp.txt";
 	ofstream tmp_file(tmp_name.c_str());
 	if (hs.size() < 5)
 	{
@@ -94,6 +96,6 @@ void Score::clear()
 	for (int i = 0; i < msg.length(); ++i)
 	{
 		cursor->gotoxy(MENU_BOX_LEFT_COOR + SNAKE_BOX_LENGTH / 2 + i, MENU_BOX_TOP_COOR + SNAKE_BOX_HEIGHT + 3);
-		cursor->generate(NULL_SYMBOL, 0);
+		cursor->generate(NULL_SYMBOL, NULL_COLOR);
 	}
 }

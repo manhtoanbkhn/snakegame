@@ -14,6 +14,7 @@
 #include <sstream>
 #include <ios>
 #include<limits>
+#include <tchar.h>
 
 
 #define SNAKE_INIT_LEN 4
@@ -36,7 +37,6 @@
 #define SNAKE_HEAD_SYMBOL char(1)
 #define SNAKE_BODY_SYMBOL char(255)
 #define FOOD_SYMBOL char(42)
-#define BIG_FOOD_SYMBOL char(15)
 #define BOX_HORIZONTAL_BORDER_SYMBOL char(205)
 #define BOX_VERTICAL_BORDER_SYMBOL char(186)
 #define BOX_LEFT_TOP_CORNER_SYMBOL char(201)
@@ -55,19 +55,15 @@
 #define SNAKE_BODY_STEP_COLOR 16
 #define SNAKE_BODY_COLOR_NUMBER 2
 
-#define SCORE_FILE_NAME "data/score.txt"
+#define SCORE_FILE_NAME "score.txt"
 #define HOW_TO_PLAY_GAME "Are you crazy? Just do not hit your body, bro!"
 
 #define MAX_NAME_LEN 8
-
-//#define INIT_SCORE 0
 
 using namespace std;
 
 typedef unsigned char SYMBOL;
 typedef unsigned int COLOR;
-
-
 
 
 
@@ -77,13 +73,6 @@ enum Direction
 	RIGHT_DIRECTION,
 	UP_DIRECTION,
 	DOWN_DIRECTION
-};
-
-enum Speed	// pixel/s
-{
-	SLOW = 5,
-	NORMAL = 8,
-	FAST= 13
 };
 
 enum Menu

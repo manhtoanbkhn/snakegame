@@ -5,9 +5,6 @@
 #include "score.h"
 
 
-
-
-
 class Box
 {
 protected:
@@ -48,7 +45,7 @@ public:
 		food.color = FOOD_COLOR;
 	}
 	void generateFood(Coordinate* head = nullptr, vector<Coordinate> body = {});
-	bool contains(Coordinate point);
+	bool contains(const Coordinate& point);
 	void initialize();
 	void draw();
 	void clear();
@@ -68,5 +65,4 @@ public:
 	void clear();
 private:
 	Score* score;
-	//Cursor content;
 };

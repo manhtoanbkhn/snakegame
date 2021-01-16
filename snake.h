@@ -21,18 +21,18 @@ class Snake
 	Score* score;
 	atomic<bool> gameOver;
 public:
-	Snake(Coordinate head,
+	Snake(const Coordinate& head,
 		SnakeBox* box,
-		Score* score, 
+		Score* score,
+		int speed,
 		int len = SNAKE_INIT_LEN,
-		int direction = RIGHT_DIRECTION,
-		int speed = SLOW);
+		int direction = RIGHT_DIRECTION);
 	void generateHead();
 	void generateBody();
 	Coordinate getNextHead();
 	void move();
 	void directionController();
-	bool collideBody(Coordinate head);
+	bool collideBody(const Coordinate& head);
 	void initialize();
 	int getNextMove();
 	void addNextMove(int next);

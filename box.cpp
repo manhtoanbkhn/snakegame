@@ -2,27 +2,6 @@
 
 
 
-
-
-//void Box::initializeBorder()
-//{
-//
-//    border.push_back(Cursor(left, top, BOX_LEFT_TOP_CORNER_SYMBOL));
-//    border.push_back(Cursor(left + width, top, BOX_RIGHT_TOP_CORNER_SYMBOL));
-//    border.push_back(Cursor(left, top + height, BOX_LEFT_BOTTOM_CORNER_SYMBOL));
-//    border.push_back(Cursor(left + width, top + height, BOX_RIGHT_BOTTOM_CORNER_SYMBOL));
-//    for (int i = 1; i < width; ++i)
-//    {
-//        border.push_back(Cursor(left + i, top, BOX_HORIZONTAL_BORDER_SYMBOL));
-//        border.push_back(Cursor(left + i, top + height, BOX_HORIZONTAL_BORDER_SYMBOL));
-//    }
-//    for (int i = 1; i < height; ++i)
-//    {
-//        border.push_back(Cursor(left, top + i, BOX_VERTICAL_BORDER_SYMBOL));
-//        border.push_back(Cursor(left + width, top + i, BOX_VERTICAL_BORDER_SYMBOL));
-//    }
-//}
-
 void Box::clearBorder()
 {
     for (int i = 0; i < width + 2; i++)
@@ -107,7 +86,7 @@ void SnakeBox::draw()
 }
 
 
-bool SnakeBox::contains(Coordinate point)
+bool SnakeBox::contains(const Coordinate& point)
 {
     if ((point.x > left) && (point.x < left + width) && (point.y < top + height) && (point.y > top))
         return true;

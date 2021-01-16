@@ -1,10 +1,7 @@
 #include "snake.h"
 
 
-
-
-
-Snake::Snake(Coordinate head, SnakeBox* box, Score* score, int len, int direction, int speed)
+Snake::Snake(const Coordinate& head, SnakeBox* box, Score* score, int speed, int len, int direction)
     : length(len), head(head), direction(direction), box(box), speed(speed), score(score)
 {
     initialized = false;
@@ -106,13 +103,6 @@ Coordinate Snake::getNextHead()
     return nextHead;
 }
 
-//void Snake::updateBody()
-//{
-//    head.symbol = SNAKE_HEAD_SYMBOL;
-//    body.insert(body.begin(), head);
-//    body.erase(body.end() - 1);
-//}
-
 int Snake::getNextMove()
 {
     lock_guard<mutex> guard(moveMutex);
@@ -138,17 +128,16 @@ void Snake::move()
 {
     Coordinate nextHead;
     int moveCount = 0;
-    //int foodCount = 1;
     
     while (true)
     {
+        PlaySound(TEXT("beep.wav"), NULL, SND_ASYNC);
         chrono::system_clock::time_point start = chrono::system_clock::now();
 
         if (!movementIsEmpty())
         {
             direction = getNextMove();
         }
-
 
         nextHead = getNextHead();
 
@@ -163,6 +152,7 @@ void Snake::move()
         // check if snake collide its body
         if (collideBody(nextHead))
         {
+            PlaySound(TEXT("endGame.wav"), NULL, SND_ASYNC);
             break;
         }
         Coordinate tail;
@@ -174,6 +164,7 @@ void Snake::move()
             head = nextHead;
             if (head == box->Food())
             {
+                PlaySound(TEXT("eatFood.wav"), NULL, SND_ASYNC);
                 if (length < SNAKE_MAX_LEN)
                     length++;
                 score->increase();
@@ -206,7 +197,7 @@ void Snake::move()
     bool hs = score->checkHighScoreAndSave();
     string message = hs ? "High Score!!!" : "Game Over!!!";
     score->notice(message);
-    this_thread::sleep_for(chrono::milliseconds(3000));
+    this_thread::sleep_for(chrono::milliseconds(2500));
 
     // clear current screen
     clear();
@@ -266,7 +257,7 @@ void Snake::directionController()
     }
 }
 
-bool Snake::collideBody(Coordinate head)
+bool Snake::collideBody(const Coordinate& head)
 {
     for (int i = 0; i < body.size(); ++i)
     {
