@@ -1,3 +1,4 @@
+#pragma comment(lib, "winmm.lib")
 #include "game.h"
 
 

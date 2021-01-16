@@ -131,7 +131,6 @@ void Snake::move()
     
     while (true)
     {
-        PlaySound(TEXT("beep.wav"), NULL, SND_ASYNC);
         chrono::system_clock::time_point start = chrono::system_clock::now();
 
         if (!movementIsEmpty())
@@ -152,7 +151,7 @@ void Snake::move()
         // check if snake collide its body
         if (collideBody(nextHead))
         {
-            PlaySound(TEXT("endGame.wav"), NULL, SND_ASYNC);
+            PlaySound(MAKEINTRESOURCE(102), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
             break;
         }
         Coordinate tail;
@@ -164,7 +163,7 @@ void Snake::move()
             head = nextHead;
             if (head == box->Food())
             {
-                PlaySound(TEXT("eatFood.wav"), NULL, SND_ASYNC);
+                PlaySound(MAKEINTRESOURCE(101), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
                 if (length < SNAKE_MAX_LEN)
                     length++;
                 score->increase();
