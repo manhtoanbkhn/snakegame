@@ -2,7 +2,7 @@
 snake game windows console app with std::cin and std::cout C++
 
 <p align="left">
-  <img src="snake.gif" width = "480" height = "360"/>
+  <img src="snake.gif" width = "600" height = "360"/>
 </p>
 
 # Idea
